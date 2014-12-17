@@ -1,7 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tahmid
- * Date: 12/16/14
- * Time: 1:35 PM
- */
+$m = new MongoClient();
+$db = $m->selectDB("prereg");
+$collection = $db->selectCollection("subjects");
+$search_doc = array('title','a ');
+echo "hello world";

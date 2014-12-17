@@ -3,7 +3,7 @@ from pymongo import MongoClient
 
 #connecting to Mongo
 client = MongoClient()
-db = client.aiub
+db = client.prereg
 collection = db.subjects
 
 html_doc = open('/Users/tahmid/Desktop/Offered.html')
