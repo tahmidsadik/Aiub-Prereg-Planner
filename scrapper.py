@@ -6,7 +6,7 @@ client = MongoClient()
 db = client.prereg
 collection = db.subjects
 
-html_doc = open('/Users/tahmid/Desktop/Offered.html')
+html_doc = open('/home/tahmid/Downloads/Offered.html')
 soup = bsoup(html_doc)
 tr = soup.find('tr')
 subjects = tr.find_next_siblings('tr')
