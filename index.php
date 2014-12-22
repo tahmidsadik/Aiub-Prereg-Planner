@@ -14,8 +14,7 @@
             </div>
         </div>
         <div id="graphWrapper">
-            <svg id="graph">
-                <rect height="200px" width="200px" />
+            <svg id="graph" width="800" height="500">
             </svg>
 
         </div>

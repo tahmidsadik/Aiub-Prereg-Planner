@@ -18,36 +18,9 @@ var selectedSubjects = [];
     };
 
     var getDayEquivalentNumber = function (day) {
-        if(day.toLocaleLowerCase() === 'saturday') {
-            return 1;
-        }
-
-        else if (day.toLowerCase() === 'sunday') {
-            return 2;
-        }
-
-        else if (day.toLowerCase() === 'monday') {
-            return 3;
-        }
-
-        else if (day.toLowerCase() === 'tuesday') {
-            return 4;
-        }
-
-        else if (day.toLowerCase() === 'wednesday') {
-            return 5;
-        }
-
-        else if (day.toLowerCase() === 'thursday') {
-            return 6;
-        }
-
-        else if (day.toLowerCase() === 'friday') {
-            return 7;
-        }
-        else {
-            return -10;
-        }
+        var daysoftheweek = {'Saturday' : 1, 'Sunday' : 2, 'Monday' : 3, 'Tuesday' : 4, 'Wednesday': 5,
+            'Thursday': 6, 'Friday': 7};
+        return daysoftheweek[day];
     };
 
 
@@ -59,7 +32,7 @@ var selectedSubjects = [];
                 if(data[i].hasOwnProperty(key)) {
                     var schedule = data[i][key]['class_schedule'];
                     for(var j = 0; j < schedule.length; j++) {
-                        var day = getDayEquivalentNumber(schedule[j]['day']);
+                        var day = getDayEquivalentNumber(schedule[j]['day'].trim());
 
                         var start = schedule[j]['starts_at'];
                         var shour = start.split(' ')[0].split(':')[0];
@@ -77,9 +50,9 @@ var selectedSubjects = [];
 
 
                         var end = schedule[j]['ends_at'];
-                        var ehour = start.split(' ')[0].split(':')[0];
-                        var emin = start.split(' ')[0].split(':')[1];
-                        var etype = start.split(' ')[1].trim();
+                        var ehour = end.split(' ')[0].split(':')[0];
+                        var emin = end.split(' ')[0].split(':')[1];
+                        var etype = end.split(' ')[1].trim();
 
                         if(etype === 'PM') {
                             ehour = parseInt(ehour);
@@ -90,7 +63,7 @@ var selectedSubjects = [];
 
                         var ends_at = parseInt(ehour + emin);
                         var duration = ends_at - start_at;
-                        sanitized_data.push({'starts_at': start_at, 'duration': duration});
+                        sanitized_data.push({'day': day, 'starts_at': start_at, 'duration': duration});
                     }
                 }
             }
@@ -100,9 +73,18 @@ var selectedSubjects = [];
 
 
     var renderGraph = function (classes) {
-        for(var i = 0; i < classes.length; i++) {
-            console.log(classes[i]);
-        }
+        console.log(d3.select('#graph'));
+        console.log(classes[0]['starts_at']);
+        console.log(classes[0]['day']);
+        console.log(classes[0]['duration']);
+        var graph = d3.select('#graph').selectAll('rect').data(classes)
+            .enter()
+            .append('rect')
+            .attr('width', function (d) { return d['duration'] / 3; })
+            .attr('height', '30')
+            .attr('x', function(d) { return d['starts_at'] / 2.5})
+            .attr('y', function(d) {return d['day'] * 40})
+            .style('fill', '#FF2637');
     };
 
     var input_box = document.getElementById('subject_search');
