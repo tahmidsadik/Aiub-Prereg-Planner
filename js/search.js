@@ -1,18 +1,108 @@
+var selectedSubjects = [];
 (function () {
-    var selectedSubjects = [];
     var onClickSubjectHandler = function() {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
                 var data = JSON.parse(xhr.responseText);
                 selectedSubjects.push(data);
-                console.log(selectedSubjects);
             }
         };
         var baseUrl = 'db_service.php';
         var url = baseUrl + '?title=' + this.innerHTML;
         xhr.open('GET', encodeURI(url), false);
         xhr.send();
+        if(selectedSubjects.length > 0) {
+            renderGraph(sanitizeData(selectedSubjects));
+        }
+    };
+
+    var getDayEquivalentNumber = function (day) {
+        if(day.toLocaleLowerCase() === 'saturday') {
+            return 1;
+        }
+
+        else if (day.toLowerCase() === 'sunday') {
+            return 2;
+        }
+
+        else if (day.toLowerCase() === 'monday') {
+            return 3;
+        }
+
+        else if (day.toLowerCase() === 'tuesday') {
+            return 4;
+        }
+
+        else if (day.toLowerCase() === 'wednesday') {
+            return 5;
+        }
+
+        else if (day.toLowerCase() === 'thursday') {
+            return 6;
+        }
+
+        else if (day.toLowerCase() === 'friday') {
+            return 7;
+        }
+        else {
+            return -10;
+        }
+    };
+
+
+    //change this part to map and filter
+    var sanitizeData = function(data) {
+        var sanitized_data = [];
+        for(var i = 0; i < data.length; i++) {
+            for(key in data[i]) {
+                if(data[i].hasOwnProperty(key)) {
+                    var schedule = data[i][key]['class_schedule'];
+                    for(var j = 0; j < schedule.length; j++) {
+                        var day = getDayEquivalentNumber(schedule[j]['day']);
+
+                        var start = schedule[j]['starts_at'];
+                        var shour = start.split(' ')[0].split(':')[0];
+                        var smin = start.split(' ')[0].split(':')[1];
+                        var stype = start.split(' ')[1].trim();
+
+                        if(stype === 'PM') {
+                            shour = parseInt(shour);
+                            if(shour < 9) {
+                                shour += 12;
+                            }
+                        }
+
+                        var start_at = parseInt(shour + smin);
+
+
+                        var end = schedule[j]['ends_at'];
+                        var ehour = start.split(' ')[0].split(':')[0];
+                        var emin = start.split(' ')[0].split(':')[1];
+                        var etype = start.split(' ')[1].trim();
+
+                        if(etype === 'PM') {
+                            ehour = parseInt(ehour);
+                            if(ehour < 9) {
+                                ehour += 12;
+                            }
+                        }
+
+                        var ends_at = parseInt(ehour + emin);
+                        var duration = ends_at - start_at;
+                        sanitized_data.push({'starts_at': start_at, 'duration': duration});
+                    }
+                }
+            }
+        }
+        return sanitized_data;
+    };
+
+
+    var renderGraph = function (classes) {
+        for(var i = 0; i < classes.length; i++) {
+            console.log(classes[i]);
+        }
     };
 
     var input_box = document.getElementById('subject_search');
@@ -29,6 +119,7 @@
                     }
 
                     //parsing json data to insert in the suggestion box
+                    //use map and filter here
                     var data = JSON.parse(xhr.responseText);
                     for(var key in data) {
                         if (data.hasOwnProperty(key)) {
